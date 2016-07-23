@@ -32,14 +32,13 @@ length = 1. # m
 
 def acceleration(position):
     # Your code here
-    position_vector = 
+    position_vector = -position
+    acceleration_pendulum = g  / numpy.linalg.norm(position_vector)**3 * position_vector
+    return acceleration_pendulum
     
-# Hint: Use the following lines of code somewhere in your program (with the ??? replaced)    
-phi = ???
-x[0] = ??? math.cos(phi)
-v[0] = ??? math.sin(phi)
 
-#@show_plot
+
+@show_plot
 def symplectic_euler(): 
     axes_x = matplotlib.pyplot.subplot(311)
     axes_x.set_ylabel('x in m')
@@ -56,9 +55,23 @@ def symplectic_euler():
     times = h * numpy.arange(num_steps + 1)
 
     num_initial_conditions = 50
-
-    for i in range(num_initial_conditions):
-        # Your code here
+    angles = numpy.linspace(1., 180., num_initial_conditions)
+    
+    for angle in angles:
+        phi = math.pi/180. * angle
+        x[0] = (2.75 * math.cos(phi))
+        v[0] = 2.* math.sin(phi)
+    
+        for i in range(num_initial_conditions):
+            # Your code here
+            x[i+1] = (x[i] +h*v[i])
+            v[i+1] = (v[i]+h*acceleration(x[i]))
+            for step in range(num_initial_conditions):
+            initial_acceleration = acceleration(x[step])
+            xE= x[step] + h * v[step]
+            vE= v[step] + h * acceleration(x[step])
+            x[step+1]= x[step]+ h * ( (v[step]+vE)/2)
+            v[step+1]= v[step] + h * ((initial_acceleration + acceleration(xE)) / 2)
         
         # Don't worry about this part of the function. It's just for making 
         # the plot look a bit nicer.
